@@ -1,17 +1,9 @@
-<?php // phpcs:disable PSR1.Files.SideEffects.FoundWithSymbols
+<?php
 /**
- * Used to rename html files to md files.
- * Also fixes the urls in the md files.
+ * Used to rename HTML files to MD files.
+ * Adds a JSON file for Docusaurus index.
  */
 
-/**
- * Lists the generated documentation files.
- *
- * @param string $dir     The starting point to search.
- * @param array       $results The results placed in this array.
- *
- * @return array the list of files.
- */
 function getDirContents(string $dir, array $results = []): array
 {
     $files = scandir($dir);
@@ -32,40 +24,77 @@ function getDirContents(string $dir, array $results = []): array
 }
 
 function get_target_dir(): string {
-	$target = getcwd();
-	$options = getopt('d::', ['dir::']);
-	$option = $options['d'] ?? $options['dir'] ?? null;
+    $target = getcwd();
+    $options = getopt('d::', ['dir::']);
+    $option = $options['d'] ?? $options['dir'] ?? null;
 
-	if (empty($option)) {
-		return $target;
-	}
+    if (empty($option)) {
+        return $target;
+    }
 
-	if ($option[0] !== '/') {
-		// relative path
-		$target .= '/' . $option;
-	}
+    if ($option[0] !== '/') {
+        // relative path
+        $target .= '/' . $option;
+    }
 
-	if (!is_readable($target) || !is_dir($target)) {
-		echo sprintf('The directory provided (%s) is not a valid target directory.', $target) . PHP_EOL;
-		echo 'This script requires a target working directory that can be provided using --dir="/path/to/docs"' . PHP_EOL;
-		exit(1);
-	}
+    if (!is_readable($target) || !is_dir($target)) {
+        echo sprintf('The directory provided (%s) is not a valid target directory.', $target) . PHP_EOL;
+        echo 'This script requires a target working directory that can be provided using --dir="/path/to/docs"' . PHP_EOL;
+        exit(1);
+    }
 
-	return $target;
+    return $target;
+}
+
+// Generate JSON file for Docusaurus index
+function generateJsonFile(string $dir, string $label, int $position, string $description): void {
+    $jsonContent = [
+        "label" => $label,
+        "position" => $position,
+        "link" => [
+            "type" => "generated-index",
+            "description" => $description,
+        ],
+    ];
+
+    $jsonPath = $dir . '/classes/_category_.json';
+
+    // Ensure the "classes" directory exists
+    if (!is_dir($dir . '/classes')) {
+        mkdir($dir . '/classes', 0777, true);
+    }
+
+    file_put_contents($jsonPath, json_encode($jsonContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    echo "JSON file generated at: $jsonPath" . PHP_EOL;
 }
 
 $target = get_target_dir();
 $files = getDirContents($target);
 
+$position = 1; // Initial sidebar position
 foreach ($files as $file) {
     echo sprintf('Processing %s...', $file);
     $content = file_get_contents($file);
-    // .html)
+
+    // Skip empty files
+    if (empty(trim($content))) {
+        echo 'Empty file. Deleting...';
+        unlink($file);
+        echo 'DONE' . PHP_EOL;
+        continue;
+    }
+
+    // Replace .html links with .md
     $content = str_replace('.html)', '.md)', $content);
-    // .html#property_id)
     $content = preg_replace('/\.html(\#[\w\_]+)\)/', '.md$1)', $content);
-    file_put_contents($file, $content);
+
+    // Rename file to .md
     $mdFilePath = preg_replace('/\.html$/', '.md', $file);
+
+    file_put_contents($mdFilePath, $content);
     rename($file, $mdFilePath);
-	echo 'DONE' . PHP_EOL;
+    echo 'DONE' . PHP_EOL;
 }
+
+// Generate the JSON file
+generateJsonFile($target, "Classes Documentation", 2, "Browse all available classes in this project.");

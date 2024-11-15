@@ -3,7 +3,7 @@
 ### {{ method.name }}
 
 ```
-{% if method.deprecated %}(deprecated) - {% endif %}{% if method.final %}final {% endif %}{% if method.static %}static {% endif %}{% if method.abstract %}abstract {% endif %}{{ method.visibility }} {{ method.name }}({% for argument in method.arguments %}{{ argument.types ? argument.types|join('&#124;')~' ' }} {{ argument.isVariadic ? '...' }}{{ argument.name }}{{ argument.default ? ' = '~argument.default }}{% if not loop.last %}, {% endif %}{% endfor %}) {{ method.response.types ? ': '~method.response.types|join('&#124;') }}
+{% if method.deprecated %}(deprecated) - {% endif %}{% if method.final %}final {% endif %}{% if method.static %}static {% endif %}{% if method.abstract %}abstract {% endif %}{{ method.visibility }} {{ method.name }}({% for argument in method.arguments %}{{ argument.getType() ? argument.getType()|join('|')~' ' }} {{ argument.isVariadic ? '...' }}{{ argument.name }}{{ argument.default ? ' = '~argument.default }}{% if not loop.last %}, {% endif %}{% endfor %}) {{ method.response.getType() ? ': '~method.response.getType()|join('|') }}
 ```
 {% if method.summary|length > 0 %}
 
@@ -49,10 +49,10 @@ Deprecated{% if method.tags.deprecated[0].version %} since {{ method.tags.deprec
 | Type | Description |
 |------|-------------|
 {% for exception in method.tags.throws %}
-| {{ exception.types|route|join('&#124;')|raw }} | {{ exception.description|raw }} |
+| {{ exception.getType()|route|join('|')|raw }} | {{ exception.description|raw }} |
 {% endfor %}
 {% for exception in method.tags.throw %}
-| {{ exception.types|route|join('&#124;')|raw }} | {{ exception.description|raw }} |
+| {{ exception.getType()|route|join('|')|raw }} | {{ exception.description|raw }} |
 {% endfor %}
 {% endif %}
 {% if method.response %}
@@ -60,7 +60,7 @@ Deprecated{% if method.tags.deprecated[0].version %} since {{ method.tags.deprec
 ##### Returns:
 
 ```
-{{ method.response.types|route|join('&#124;')|raw }}
+{{ method.response.getType()|route|join('|')|raw }}
 ```
 {% if method.response.description is not empty %}
 {{ method.response.description }}

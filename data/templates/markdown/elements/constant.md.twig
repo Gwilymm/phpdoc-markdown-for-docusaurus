@@ -10,7 +10,7 @@ Inherited from [{{ constant.parent.fullyQualifiedStructuralElementName }}]({{ li
 {% endif %}
 
 ```
-{{ constant.name }} = {{ constant.value|raw }}{% if not (constant.types is empty) %} : {{ constant.types|join('|') }}{% endif %}
+{{ constant.name }} = {{ constant.value|raw }}{% if not (constant.getType() is empty) %} : {{ constant.getType()|join('|') }}{% endif %}
 
 ```
 

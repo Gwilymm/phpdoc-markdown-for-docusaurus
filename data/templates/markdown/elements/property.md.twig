@@ -1,6 +1,6 @@
 {% block property %}
 <a id="property_{{ property.name }}"></a>
-#### {{ property.visibility }} ${{ property.name }}{% if property.types %} : {{ property.types|join('|') }}{% endif %}{% if property.deprecated %} - (deprecated){% endif %}
+#### {{ property.visibility }} ${{ property.name }}{% if property.getType() %} : {{ property.getType()|join('|') }}{% endif %}{% if property.deprecated %} - (deprecated){% endif %}
 
 ---
 {% if property.summary|length > 0 %}
@@ -15,8 +15,8 @@
 {{ property.description|raw }}
 
 {% endif %}
-{% if property.types %}
-**Type:** {{ property.types|route|join('|')|raw }}
+{% if property.getType() %}
+**Type:** {{ property.getType()|route|join('|')|raw }}
 {% if property.var.0.description %}{{ property.var.0.description }}{% endif %}
 {% endif %}
 
