@@ -2,6 +2,7 @@
 /**
  * Used to rename HTML files to MD files.
  * Adds a JSON file for Docusaurus index.
+ * Organizes files into subdirectories based on type.
  */
 
 function getDirContents(string $dir, array $results = []): array
@@ -23,7 +24,8 @@ function getDirContents(string $dir, array $results = []): array
     return $results;
 }
 
-function get_target_dir(): string {
+function get_target_dir(): string
+{
     $target = getcwd();
     $options = getopt('d::', ['dir::']);
     $option = $options['d'] ?? $options['dir'] ?? null;
@@ -46,8 +48,27 @@ function get_target_dir(): string {
     return $target;
 }
 
-// Generate JSON file for Docusaurus index
-function generateJsonFile(string $dir, string $label, int $position, string $description): void {
+function organizeFile(string $filePath, string $baseDir): string
+{
+    $fileName = basename($filePath);
+    if (preg_match('/App-(Controller|Entity|Form|Repository|Command)-(.*)\.html$/', $fileName, $matches)) {
+        $type = strtolower($matches[1]);
+        $targetDir = $baseDir . '/' . $type;
+
+        if (!is_dir($targetDir)) {
+            mkdir($targetDir, 0777, true);
+        }
+
+        $newPath = $targetDir . '/' . $fileName;
+        rename($filePath, $newPath);
+        return $newPath;
+    }
+
+    return $filePath;
+}
+
+function generateJsonFile(string $dir, string $label, int $position, string $description): void
+{
     $jsonContent = [
         "label" => $label,
         "position" => $position,
@@ -57,11 +78,11 @@ function generateJsonFile(string $dir, string $label, int $position, string $des
         ],
     ];
 
-    $jsonPath = $dir . '/classes/_category_.json';
+    $jsonPath = $dir . '/_category_.json';
 
-    // Ensure the "classes" directory exists
-    if (!is_dir($dir . '/classes')) {
-        mkdir($dir . '/classes', 0777, true);
+    // Ensure the directory exists
+    if (!is_dir($dir)) {
+        mkdir($dir, 0777, true);
     }
 
     file_put_contents($jsonPath, json_encode($jsonContent, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
@@ -84,6 +105,9 @@ foreach ($files as $file) {
         continue;
     }
 
+    // Organize file into type-based directories
+    $file = organizeFile($file, $target);
+
     // Replace .html links with .md
     $content = str_replace('.html)', '.md)', $content);
     $content = preg_replace('/\.html(\#[\w\_]+)\)/', '.md$1)', $content);
@@ -96,5 +120,11 @@ foreach ($files as $file) {
     echo 'DONE' . PHP_EOL;
 }
 
-// Generate the JSON file
-generateJsonFile($target, "Classes Documentation", 2, "Browse all available classes in this project.");
+// Generate the JSON file for each organized folder
+$organizedDirs = ['controller', 'entity', 'form', 'repository', 'command'];
+foreach ($organizedDirs as $dir) {
+    $path = $target . '/' . $dir;
+    if (is_dir($path)) {
+        generateJsonFile($path, ucfirst($dir) . " Documentation", $position++, "Browse all available " . $dir . "s in this project.");
+    }
+}
