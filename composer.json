@@ -1,13 +1,13 @@
 {
-    "name": "automattic/phpdoc-markdown",
-    "description": "phpDocumentor v3 template that generates Markdown documentation for Github.",
-    "keywords" : [ "PHPDoc", "phpDocumentor", "Documentation", "Markdown", "Template", "Github" ],
-    "homepage" : "https://github.com/automattic/phpdoc-markdown",
+    "name": "gwilym/phpdoc-markdown-for-docusaurus",
+    "description": "phpDocumentor v3 template that generates Markdown documentation for Docusaurus.",
+    "keywords" : [ "PHPDoc", "phpDocumentor", "Documentation", "Markdown", "Template", "Docusaurus" ],
+    "homepage" : "https://github.com/Gwilymm/phpdoc-markdown-for-docusaurus",
     "license": "MIT",
     "authors": [
         {
-            "name": "Automattic",
-            "homepage": "https://automattic.com"
+            "name": "Gwilymm for Sparrow Développement",
+            "homepage": "https://www.sprw.dev"
         }
     ],
     "require-dev": {
