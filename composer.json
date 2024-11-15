@@ -1,5 +1,5 @@
 {
-    "name": "gwilym/phpdoc-markdown-for-docusaurus",
+    "name": "gwilymm/phpdoc-markdown-for-docusaurus",
     "description": "phpDocumentor v3 template that generates Markdown documentation for Docusaurus.",
     "keywords" : [ "PHPDoc", "phpDocumentor", "Documentation", "Markdown", "Template", "Docusaurus" ],
     "homepage" : "https://github.com/Gwilymm/phpdoc-markdown-for-docusaurus",
