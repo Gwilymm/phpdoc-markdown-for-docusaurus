@@ -92,7 +92,7 @@ function generateJsonFile(string $dir, string $label, int $position, string $des
 $target = get_target_dir();
 $files = getDirContents($target);
 
-$position = 1; // Initial sidebar position
+$position = 2; // Initial sidebar position
 foreach ($files as $file) {
     echo sprintf('Processing %s...', $file);
     $content = file_get_contents($file);
