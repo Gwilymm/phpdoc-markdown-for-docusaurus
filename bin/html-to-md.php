@@ -30,6 +30,8 @@ function get_target_dir(): string
     $target = getcwd();
     $options = getopt('d::', ['dir::']);
     $option = $options['d'] ?? $options['dir'] ?? null;
+    echo 'Target directory: ' . $target . PHP_EOL;
+    echo 'Option provided: ' . $option . PHP_EOL;
 
     if (empty($option)) {
         return $target;
