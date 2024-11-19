@@ -37,7 +37,10 @@ function get_target_dir(): string
 
     if ($option[0] !== '/') {
         // relative path
+
         $target .= '/' . $option;
+
+        echo sprintf('Relative path provided. Using %s as target directory.', $target) . PHP_EOL;
     }
 
     if (!is_readable($target) || !is_dir($target)) {
