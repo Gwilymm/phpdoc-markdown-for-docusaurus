@@ -30,6 +30,13 @@ function get_target_dir(): string
     $target = getcwd();
     $options = getopt('d::', ['dir::']);
     $option = $options['d'] ?? $options['dir'] ?? null;
+
+    // Check if a directory argument is provided directly
+    global $argv;
+    if (isset($argv[1]) && is_dir($argv[1])) {
+        $option = $argv[1];
+    }
+
     echo 'Target directory: ' . $target . PHP_EOL;
     echo 'Option provided: ' . $option . PHP_EOL;
 
@@ -39,10 +46,11 @@ function get_target_dir(): string
 
     if ($option[0] !== '/') {
         // relative path
-
         $target .= '/' . $option;
-
         echo sprintf('Relative path provided. Using %s as target directory.', $target) . PHP_EOL;
+    } else {
+        // absolute path
+        $target = $option;
     }
 
     if (!is_readable($target) || !is_dir($target)) {
