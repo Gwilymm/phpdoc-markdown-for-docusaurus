@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Used to rename HTML files to MD files.
  * Adds a JSON file for Docusaurus index.
@@ -51,7 +52,7 @@ function get_target_dir(): string
 function organizeFile(string $filePath, string $baseDir): string
 {
     $fileName = basename($filePath);
-    if (preg_match('/App-(Controller|Entity|Form|Repository|Command)-(.*)\.html$/', $fileName, $matches)) {
+    if (preg_match('/App-([A-Za-z]+)-(.*)\.html$/', $fileName, $matches)) {
         $type = strtolower($matches[1]);
         $targetDir = $baseDir . '/' . $type;
 
@@ -93,6 +94,8 @@ $target = get_target_dir();
 $files = getDirContents($target);
 
 $position = 2; // Initial sidebar position
+$organizedTypes = [];
+
 foreach ($files as $file) {
     echo sprintf('Processing %s...', $file);
     $content = file_get_contents($file);
@@ -108,6 +111,11 @@ foreach ($files as $file) {
     // Organize file into type-based directories
     $file = organizeFile($file, $target);
 
+    // Extract type from organized path
+    if (preg_match('/App-([A-Za-z]+)-/', basename($file), $matches)) {
+        $organizedTypes[strtolower($matches[1])] = true;
+    }
+
     // Replace .html links with .md
     $content = str_replace('.html)', '.md)', $content);
     $content = preg_replace('/\.html(\#[\w\_]+)\)/', '.md$1)', $content);
@@ -121,10 +129,9 @@ foreach ($files as $file) {
 }
 
 // Generate the JSON file for each organized folder
-$organizedDirs = ['controller', 'entity', 'form', 'repository', 'command'];
-foreach ($organizedDirs as $dir) {
-    $path = $target . '/' . $dir;
+foreach (array_keys($organizedTypes) as $type) {
+    $path = $target . '/' . $type;
     if (is_dir($path)) {
-        generateJsonFile($path, ucfirst($dir) . " Documentation", $position++, "Browse all available " . $dir . "s in this project.");
+        generateJsonFile($path, ucfirst($type) . " Documentation", $position++, "Browse all available " . $type . "s in this project.");
     }
 }
